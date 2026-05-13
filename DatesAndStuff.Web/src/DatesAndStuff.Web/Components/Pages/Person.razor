@@ -69,7 +69,21 @@
     public class FormModel
     {
         [Required(ErrorMessage = "Percentage should be specified")]
-        [Range(-10d, Double.MaxValue, ErrorMessage = "The specified percentag should be between -10 and infinity.")]
+        [GreaterThan(-10, ErrorMessage = "The specified percentag should be between -10 and infinity.")]
         public double SalaryIncreasePercentage { get; set; } = 0;
+       
+    }
+    
+    public class GreaterThanAttribute : ValidationAttribute
+    {
+        private readonly double _min;
+        public GreaterThanAttribute(double min) { _min = min; }
+        protected override ValidationResult? IsValid(object? value, ValidationContext context)
+        {
+            if (value is double d && d > _min)
+                return ValidationResult.Success;
+            return new ValidationResult(ErrorMessage ?? $"Value must be greater than {_min}.",
+                new[] { context.MemberName! });
+        }
     }
 }
